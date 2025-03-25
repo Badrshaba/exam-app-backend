@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: my_postgresDB
+    environment:
+      POSTGRES_USER: badr
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: prisma_course
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
