@@ -7,12 +7,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  STUDENT
+  PROFESSOR
+  ADMIN
+}
+
 model User {
-  id        String @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String @unique
-  password  String
+  id          String   @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String   @unique
+  password    String
+  photo       String?
+  role        UserRole @default(STUDENT)
+  CreateExaim Exaim[]?
+  createdAt   DateTime @default(Date.now())
+  updatedAt   DateTime @updatedAt
 
   @@index([email])
+}
+
+model Exaim {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  questions   Json
+  createdBy   User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(Date.now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
 }

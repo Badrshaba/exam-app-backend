@@ -31,6 +31,17 @@ export const signUp = async (req, res, next) => {
   });
 };
 
+// ========================================= SignIn API ================================//
+
+/**
+ * destructuring the required data from the request body
+ * check if the user already exists in the database using the email
+ * if exists return error email is already exists
+ * password hashing
+ * create new document in the database
+ * return the response
+ */
+
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
@@ -49,5 +60,37 @@ export const signin = async (req, res, next) => {
     message: 'User logged in successfully',
     token,
     data: user,
+  });
+};
+
+// ========================================= Set Password API =======================//
+
+/**
+ * destructuring the required data from the request body
+ * check if the user already exists in the database using the email
+ * if exists return error email is already exists
+ * password hashing
+ * create new document in the database
+ * return the response
+ */
+
+export const setPassword = async (req, res, next) => {
+  const { oldPassword, newPassword } = req.body;
+  const { id } = req.authUser;
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) {
+    return next(new Error('Invalid email or password ', { cause: 401 }));
+  }
+  const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+  if (!isPasswordMatch) {
+    return next(new Error('Invalid old password ', { cause: 401 }));
+  }
+  // password hashing
+  const hashedPassword = await bcrypt.hash(newPassword, +process.env.SALT_ROUNDS);
+  // update password in the database
+  await prisma.user.update({ where: { id }, data: { password: hashedPassword } });
+  res.status(200).json({
+    success: true,
+    message: 'Password updated successfully',
   });
 };
