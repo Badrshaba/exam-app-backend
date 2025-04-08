@@ -21,8 +21,8 @@ model User {
   password    String
   photo       String?
   role        UserRole @default(STUDENT)
-  CreateExaim Exaim[]?
-  createdAt   DateTime @default(Date.now())
+  CreateExaim Exaim[]
+  createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([email])
@@ -37,7 +37,7 @@ model Exaim {
   questions   Json
   createdBy   User     @relation(fields: [userId], references: [id])
   userId      String
-  createdAt   DateTime @default(Date.now())
+  createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([date])
