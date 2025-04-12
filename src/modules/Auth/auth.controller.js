@@ -36,19 +36,25 @@ export const signUp = async (req, res, next) => {
 /**
  * destructuring the required data from the request body
  * check if the user already exists in the database using the email
- * if exists return error email is already exists
- * password hashing
- * create new document in the database
+ * if not exists return error Invalid email or password
+ * compare password
+ * if password not match return error Invalid email or password
+ * create token
  * return the response
  */
 
 export const signin = async (req, res, next) => {
+  // destructuring the required data from the request body
   const { email, password } = req.body;
+  // check if the user already exists in the database using the email
   const user = await prisma.user.findUnique({ where: { email } });
+  // if not exists return error Invalid email or password
   if (!user) {
     return next(new Error('Invalid email or password ', { cause: 401 }));
   }
+  // compare password
   const isPasswordMatch = await bcrypt.compare(password, user.password);
+  // if old password not match return error Invalid email or password
   if (!isPasswordMatch) {
     return next(new Error('Invalid email or password ', { cause: 401 }));
   }
@@ -67,23 +73,30 @@ export const signin = async (req, res, next) => {
 
 /**
  * destructuring the required data from the request body
- * check if the user already exists in the database using the email
- * if exists return error email is already exists
+ * check if the user already exists in the database using the id
+ * if not exists return error login first
+ * compare password
+ * if old password not match return error Invalid password
  * password hashing
- * create new document in the database
+ * update password in the database
  * return the response
  */
 
 export const setPassword = async (req, res, next) => {
+  // destructuring the required data from the request body
   const { oldPassword, newPassword } = req.body;
   const { id } = req.authUser;
+  // check if the user already exists in the database using the id
   const user = await prisma.user.findUnique({ where: { id } });
+  // if not exists return error login first
   if (!user) {
-    return next(new Error('Invalid email or password ', { cause: 401 }));
+    return next(new Error('login first', { cause: 401 }));
   }
+  // compare password
   const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+  // if old password not match return error Invalid password
   if (!isPasswordMatch) {
-    return next(new Error('Invalid old password ', { cause: 401 }));
+    return next(new Error('Invalid password ', { cause: 401 }));
   }
   // password hashing
   const hashedPassword = await bcrypt.hash(newPassword, +process.env.SALT_ROUNDS);

@@ -2,11 +2,21 @@ import Joi from 'joi';
 
 export const signUpSchema = {
   body: Joi.object({
-    username: Joi.string().min(3).max(20).required(),
+    firstName: Joi.string().min(3).max(20).required(),
+    lastName: Joi.string().min(3).max(20).required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(8).required(),
-    age: Joi.number().min(18).max(100).required(),
-    phoneNumbers: Joi.array(),
-    addresses: Joi.array(),
+  }),
+};
+export const signInSchema = {
+  body: Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().min(8).required(),
+  }),
+};
+export const setPasswordSchema = {
+  body: Joi.object({
+    oldPassword: Joi.string().min(8).required(),
+    newPassword: Joi.string().min(8).required(),
   }),
 };
